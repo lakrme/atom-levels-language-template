@@ -1,0 +1,27 @@
+{
+  "name": "Ruby",
+  "levels": [
+    {
+      "name": "Level 1",
+      "description": "Description for level 1"
+    },
+    {
+      "name": "Level 2",
+      "description": "Description for level 2"
+    },
+    {
+      "name": "Level 3"
+    }
+  ],
+  "scopeName": "levels.source.ruby",
+  "levelCodeFileTypes": [
+    "rb-levels",
+    "lrb",
+    "rbl"
+  ],
+  "objectCodeFileType": "rb",
+  "lineCommentPattern": "# <commentText>",
+  "executable": "run",
+  "executionMode": "interpreted",
+  "interpreterCmdPattern": "ruby <filePath>"
+}
