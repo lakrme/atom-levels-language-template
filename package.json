@@ -1,12 +1,14 @@
 {
-  "name": "atom-levels-language-test",
+  "name": "levels-language-test",
   "main": "./lib/main",
   "version": "0.0.0",
-  "description": "A short description of your package",
+  "description": "A test for including Levels languages as packages.",
   "keywords": [
+    "language",
+    "levels",
+    "lps"
   ],
-  "repository": "https://github.com/atom/atom-levels-language-test",
-  "license": "MIT",
+  "repository": "https://github.com/lakrme/atom-levels-language-test",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
@@ -16,7 +18,5 @@
         "^0.2.0": "consumeLevels"
       }
     }
-  },
-  "dependencies": {
   }
 }

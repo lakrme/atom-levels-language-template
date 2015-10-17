@@ -3,7 +3,8 @@
   "levels": [
     {
       "name": "Level 1",
-      "description": "Description for level 1"
+      "description": "Description for level 1",
+      "grammar": "grammars/level-2.cson"
     },
     {
       "name": "Level 2",
@@ -13,15 +14,19 @@
       "name": "Level 3"
     }
   ],
+  "lastActiveLevel": "Level 1",
+  "defaultGrammar": "grammars/default.cson",
   "scopeName": "levels.source.ruby",
   "levelCodeFileTypes": [
     "rb-levels",
     "lrb",
-    "rbl"
+    "rbl",
+    "rb"
   ],
   "objectCodeFileType": "rb",
   "lineCommentPattern": "# <commentText>",
-  "executable": "run",
+  "executable": "executable/darwin/run",
   "executionMode": "interpreted",
-  "interpreterCmdPattern": "ruby <filePath>"
+  "interpreterCmdPattern": "ruby <filePath>",
+  "installationDate": "Invalid date"
 }

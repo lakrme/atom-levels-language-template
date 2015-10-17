@@ -1,7 +1,0 @@
-name: "Ruby (Levels)"
-scopeName: "levels.source.ruby"
-fileTypes: [
-  "rb-levels"
-  "lrb"
-  "rbl"
-]
