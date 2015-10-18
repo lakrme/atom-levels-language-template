@@ -1,14 +1,14 @@
 {
-  "name": "levels-language-test",
+  "name": "levels-language-template",
   "main": "./lib/main",
   "version": "0.0.0",
-  "description": "A test for including Levels languages as packages.",
+  "description": "The template for Levels language packages.",
   "keywords": [
     "language",
     "levels",
     "lps"
   ],
-  "repository": "https://github.com/lakrme/atom-levels-language-test",
+  "repository": "https://github.com/lakrme/atom-levels-language-template",
   "engines": {
     "atom": ">=1.0.0 <2.0.0"
   },
