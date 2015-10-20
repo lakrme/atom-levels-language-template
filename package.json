@@ -18,5 +18,8 @@
         "^0.2.0": "consumeLevels"
       }
     }
+  },
+  "dependencies": {
+    "season": "^5.2.0"
   }
 }
