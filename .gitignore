@@ -1,6 +1,3 @@
 .DS_Store
-language/grammars/*
 npm-debug.log
 node_modules
-run
-run.exe
