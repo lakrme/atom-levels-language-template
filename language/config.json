@@ -14,9 +14,8 @@
       "name": "Level 3"
     }
   ],
-  "lastActiveLevel": "Level 1",
+  "lastActiveLevel": "Level 3",
   "defaultGrammar": "grammars/default.cson",
-  "scopeName": "levels.source.ruby",
   "levelCodeFileTypes": [
     "rb-levels",
     "lrb",
@@ -25,8 +24,6 @@
   ],
   "objectCodeFileType": "rb",
   "lineCommentPattern": "# <commentText>",
-  "executable": "executable/darwin/run",
   "executionMode": "interpreted",
-  "interpreterCmdPattern": "ruby <filePath>",
-  "installationDate": "Invalid date"
+  "interpreterCmdPattern": "ruby <filePath>"
 }
