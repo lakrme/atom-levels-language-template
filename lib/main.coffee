@@ -1,41 +1,120 @@
-path   = require('path')
-
-configManager = require('./config')
+{Emitter,Disposable} = require('atom')
+path                 = require('path')
+CSON                 = require('season')
 
 # ------------------------------------------------------------------------------
 
 module.exports =
 
-  # config: configManager.getPackageConfigurations()
+  ## Language package settings -------------------------------------------------
+
+  config:
+    levelCodeFileTypes:
+      title: 'Level Code File Types'
+      description: ''
+      type: 'array'
+      default: []
+      items:
+        type: 'string'
+    objectCodeFileType:
+      title: 'Object Code File Type'
+      description: ''
+      type: 'string'
+      default: ''
+    lineCommentPattern:
+      title: 'Line Comment Pattern'
+      description: ''
+      type: 'string'
+      default: ''
+    executionCommandPatterns:
+      title: 'Execution Command Patterns'
+      description: ''
+      type: 'array'
+      default: []
+      items:
+        type: 'string'
+
+  ## Language package activation and deactivation ------------------------------
 
   activate: ->
-    # set up paths
-    @configFilePath = path.join(path.dirname(__dirname),'language','config.json')
+    @emitter = new Emitter
 
-    atom.grammars.onDidAddGrammar (grammar) ->
-      if grammar.scopeName is 'levels.source.dummy'
-        console.log "now grammar change"
-        grammar.name = 'Ruby (Levels)'
-        grammar.fileTypes = ['rb']
+    @pkgDirPath = path.dirname(__dirname)
+    pkgMetadataFilePath = CSON.resolve(path.join(@pkgDirPath,'package'))
+    @pkgMetadata = CSON.readFileSync(pkgMetadataFilePath)
 
-    atom.packages.onDidActivatePackage (pkg) ->
-      if pkg.name is 'levels-language-test'
-        console.log "activated"
-        console.log pkg
+    @configFilePath = @getConfigFilePath()
+    @executablePath = @getExecutablePath()
 
-    # atom.packages.onDidActivatePackage (pkg) ->
-    #   if pkg.name is 'atom-levels-language-test'
-    #     console.log pkg
-    #     grammar = atom.grammars.grammarForScopeName('levels.source.ruby')
-    #     console.log grammar
+    pkgSubscr = atom.packages.onDidActivatePackage (pkg) =>
+      if pkg.name is @pkgMetadata.name
+        @dummyGrammar = pkg.grammars[0]
+        atom.grammars.removeGrammar(@dummyGrammar)
+        @startUsingLevels() if @levelsIsActive
+        @onDidActivateLevels => @startUsingLevels()
+        @onDidDeactivateLevels => @stopUsingLevels()
+        pkgSubscr.dispose()
 
   deactivate: ->
-    @languageRegistry.removeLanguage(@language)
+    @languageRegistry.removeLanguage(@language) if @levelsIsActive
 
-  ## Consumed services ---------------------------------------------------------
+  ## Activation helpers --------------------------------------------------------
+
+  getConfigFilePath: ->
+    CSON.resolve(path.join(@pkgDirPath,'language','config'))
+
+  getExecutablePath: ->
+    executableDirPath = path.join(@pkgDirPath,'language','executable')
+    switch process.platform
+      when 'darwin' then path.join(executableDirPath,'darwin','run')
+      when 'linux'  then path.join(executableDirPath,'linux','run')
+      when 'win32'  then path.join(executableDirPath,'win32','run.exe')
+
+  ## Interacting with the Levels package ---------------------------------------
+
+  onDidActivateLevels: (callback) ->
+    @emitter.on('did-activate-levels',callback)
+
+  onDidDeactivateLevels: (callback) ->
+    @emitter.on('did-deactivate-levels',callback)
 
   consumeLevels: ({@languageRegistry}) ->
-    console.log "now consume"
-    @language = @languageRegistry.loadLanguage(@configFilePath)
+    @levelsIsActive = true
+    @emitter.emit('did-activate-levels')
+    new Disposable =>
+      @levelsIsActive = false
+      @emitter.emit('did-deactivate-levels')
+
+  startUsingLevels: ->
+    unless @language?
+      @language = @languageRegistry.readLanguageSync\
+        (@configFilePath,@executablePath)
+      @dummyGrammar.name = @language.getGrammarName()
+      @dummyGrammar.scopeName = @language.getScopeName()
+      @dummyGrammar.fileTypes = @language.getLevelCodeFileTypes()
+      @language.setDummyGrammar(@dummyGrammar)
+      @initializeLanguageSettings()
+    atom.grammars.addGrammar(@dummyGrammar)
+    @languageRegistry.addLanguage(@language)
+
+  stopUsingLevels: ->
+    atom.grammars.removeGrammar(@dummyGrammar)
+
+  ## Language configuration management -----------------------------------------
+
+  initializeLanguageSettings: ->
+    pkgName = @pkgMetadata.name
+    atom.config.set "#{pkgName}.levelCodeFileTypes", \
+      @language.getLevelCodeFileTypes()
+    atom.config.onDidChange "#{pkgName}.levelCodeFileTypes", ({newValue}) =>
+      @language.setLevelCodeFileTypes(newValue)
+    atom.config.set "#{pkgName}.objectCodeFileType", \
+      @language.getObjectCodeFileType()
+    atom.config.onDidChange "#{pkgName}.objectCodeFileType", ({newValue}) =>
+      @language.setObjectCodeFileType(newValue)
+    atom.config.set "#{pkgName}.lineCommentPattern", \
+      @language.getLineCommentPattern()
+    atom.config.onDidChange "#{pkgName}.lineCommentPattern", ({newValue}) =>
+      @language.setLineCommentPattern(newValue)
 
 # ------------------------------------------------------------------------------
