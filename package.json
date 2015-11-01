@@ -2,7 +2,7 @@
   "name": "levels-language-template",
   "main": "./lib/main",
   "version": "0.0.0",
-  "description": "The template for Levels language packages.",
+  "description": "A template for Levels language packages.",
   "keywords": [
     "language",
     "levels",
@@ -15,7 +15,7 @@
   "consumedServices": {
     "levels": {
       "versions": {
-        "^0.2.0": "consumeLevels"
+        "^0.3.0": "consumeLevels"
       }
     }
   },

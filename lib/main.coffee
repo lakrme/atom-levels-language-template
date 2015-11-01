@@ -9,30 +9,48 @@ module.exports =
   ## Language package settings -------------------------------------------------
 
   config:
-    levelCodeFileTypes:
-      title: 'Level Code File Types'
-      description: ''
-      type: 'array'
-      default: []
-      items:
-        type: 'string'
-    objectCodeFileType:
-      title: 'Object Code File Type'
-      description: ''
-      type: 'string'
-      default: ''
-    lineCommentPattern:
-      title: 'Line Comment Pattern'
-      description: ''
-      type: 'string'
-      default: ''
-    executionCommandPatterns:
-      title: 'Execution Command Patterns'
-      description: ''
-      type: 'array'
-      default: []
-      items:
-        type: 'string'
+    generalSettings:
+      type: 'object'
+      order: 1
+      properties:
+        levelCodeFileTypes:
+          title: 'Level Code File Type(s)'
+          description:
+            'A comma-separated list of file type extensions that are associated
+            with this level language. This allows Levels to select the correct
+            language when a file is opened or saved and no other language
+            information is given. It\'s also possible to add a file type that is
+            already associated with another installed grammar (e.g. `rb` for a
+            Ruby-based level language).'
+          type: 'array'
+          default: []
+          items:
+            type: 'string'
+    executionSettings:
+      type: 'object'
+      order: 2
+      properties:
+        # objectCodeFileType:
+        #   title: 'Object Code File Type'
+        #   description:
+        #     'The default file type extension of the back-end programming
+        #     language for this level language (e.g. `hs` for a Haskell-based
+        #     level language). The object code file type is needed for '
+        #   type: 'string'
+        #   default: ''
+        executionCommandPatterns:
+          title: 'Execution Command Pattern(s)'
+          description:
+            'A comma-separated list of patterns for the commands that will be
+            executed (sequentially) to run your programs. Use the `<filePath>`
+            variable to indicate where to insert the input file for each
+            command. To run a generated executable file, add `./<filePath>` to
+            the end of the list (e.g. `ghc -v0 <filePath>, ./<filePath>` for a
+            Haskell-based level language).'
+          type: 'array'
+          default: []
+          items:
+            type: 'string'
 
   ## Language package activation and deactivation ------------------------------
 
@@ -93,7 +111,7 @@ module.exports =
       @dummyGrammar.scopeName = @language.getScopeName()
       @dummyGrammar.fileTypes = @language.getLevelCodeFileTypes()
       @language.setDummyGrammar(@dummyGrammar)
-      @initializeLanguageSettings()
+      @setUpLanguageConfigurationManagement()
     atom.grammars.addGrammar(@dummyGrammar)
     @languageRegistry.addLanguage(@language)
 
@@ -102,19 +120,31 @@ module.exports =
 
   ## Language configuration management -----------------------------------------
 
-  initializeLanguageSettings: ->
+  setUpLanguageConfigurationManagement: ->
     pkgName = @pkgMetadata.name
-    atom.config.set "#{pkgName}.levelCodeFileTypes", \
-      @language.getLevelCodeFileTypes()
-    atom.config.onDidChange "#{pkgName}.levelCodeFileTypes", ({newValue}) =>
+
+    configKeyPath = "#{pkgName}.generalSettings.levelCodeFileTypes"
+    if (levelCodeFileTypes = atom.config.get(configKeyPath)).length > 0
+      @language.setLevelCodeFileTypes(levelCodeFileTypes)
+    else
+      atom.config.set(configKeyPath,@language.getLevelCodeFileTypes())
+    atom.config.onDidChange configKeyPath, ({newValue}) =>
       @language.setLevelCodeFileTypes(newValue)
-    atom.config.set "#{pkgName}.objectCodeFileType", \
-      @language.getObjectCodeFileType()
-    atom.config.onDidChange "#{pkgName}.objectCodeFileType", ({newValue}) =>
-      @language.setObjectCodeFileType(newValue)
-    atom.config.set "#{pkgName}.lineCommentPattern", \
-      @language.getLineCommentPattern()
-    atom.config.onDidChange "#{pkgName}.lineCommentPattern", ({newValue}) =>
-      @language.setLineCommentPattern(newValue)
+
+    # configKeyPath = "#{pkgName}.executionSettings.objectCodeFileType"
+    # if (objectCodeFileType = atom.config.get(configKeyPath))
+    #   @language.setObjectCodeFileType(objectCodeFileType)
+    # else
+    #   atom.config.set(configKeyPath,@language.getObjectCodeFileType())
+    # atom.config.onDidChange configKeyPath, ({newValue}) =>
+    #   @language.setObjectCodeFileType(newValue)
+
+    configKeyPath = "#{pkgName}.executionSettings.executionCommandPatterns"
+    if (executionCommandPatterns = atom.config.get(configKeyPath))
+      @language.setExecutionCommandPatterns(executionCommandPatterns)
+    else
+      atom.config.set(configKeyPath,@language.getExecutionCommandPatterns())
+    atom.config.onDidChange configKeyPath, ({newValue}) =>
+      @language.setExecutionCommandPatterns(newValue)
 
 # ------------------------------------------------------------------------------

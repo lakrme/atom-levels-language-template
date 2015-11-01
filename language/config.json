@@ -20,10 +20,12 @@
     "rb-levels",
     "lrb",
     "rbl",
-    "rb"
+    "rb",
+    "abc"
   ],
   "objectCodeFileType": "rb",
-  "lineCommentPattern": "# <commentText>",
-  "executionMode": "interpreted",
-  "interpreterCmdPattern": "ruby <filePath>"
+  "lineCommentPattern": "# <comment>",
+  "executionCommandPatterns": [
+    "ruby <filePath>"
+  ]
 }
